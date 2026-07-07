@@ -1,0 +1,1 @@
+"""Stellwerk platform core (FastAPI)."""
