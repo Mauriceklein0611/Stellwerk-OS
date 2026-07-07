@@ -1,0 +1,102 @@
+# Stellwerk – Basis-Compose (Entwicklung/Standard).
+#
+# Profile:
+#   core        (Default) Kern + Postgres + einmaliger Migrate-Job
+#   llm         zusätzlich Ollama (lokale Modelle)
+#   monitoring  Platzhalter, wird in #12 mit Prometheus/Grafana gefüllt
+#
+# Migrations-Strategie (CORE-ADR-001 / PR #5): ein eigener, kurzlebiger
+# `migrate`-Service führt `alembic upgrade head` aus und beendet sich. Der Kern
+# startet erst nach dessen erfolgreichem Abschluss
+# (`condition: service_completed_successfully`). Vorteile gegenüber einem
+# Entrypoint-Hook: die Migration läuft genau einmal (nicht pro Replica), der
+# Kern-Start bleibt schlank, und der Migrationsausgang ist im Job-Log isoliert.
+
+x-core-image: &core-image
+  build:
+    context: ./services/core
+    dockerfile: Dockerfile
+  image: stellwerk-core:dev
+
+# DB-URL, die die Container-Services nutzen (Host = Compose-Servicename `postgres`).
+x-core-db-url: &core-db-url
+  STW_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-stw}:${POSTGRES_PASSWORD:-stw}@postgres:5432/${POSTGRES_DB:-stellwerk}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["core", "llm", "monitoring"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-stw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stw}
+      POSTGRES_DB: ${POSTGRES_DB:-stellwerk}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stw} -d ${POSTGRES_DB:-stellwerk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Kurzlebiger Job: Schema auf den aktuellen Stand bringen, dann beenden.
+  migrate:
+    <<: *core-image
+    profiles: ["core", "llm", "monitoring"]
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *core-db-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  core:
+    <<: *core-image
+    profiles: ["core", "llm", "monitoring"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Überschreibt den localhost-Wert aus .env für den Container-Netzwerkfall.
+      <<: *core-db-url
+      # Ollama-Basis (vom Gateway ab #6 genutzt; heute nur Verdrahtung).
+      STW_OLLAMA_BASE_URL: http://ollama:11434
+    ports:
+      - "${CORE_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=4).status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["llm"]
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # --- monitoring (Profil-Platzhalter) ---------------------------------------
+  # Issue #12 ergänzt hier `prometheus` und `grafana` inkl. Provisioning aus
+  # ./monitoring. Bis dahin bleibt das Profil bewusst leer, damit
+  # `--profile monitoring` bereits jetzt gültig auflöst.
+
+volumes:
+  pgdata:
+  ollama-models:

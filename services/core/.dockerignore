@@ -1,0 +1,24 @@
+# Nur das Nötige in den Build-Context: schlankere, reproduzierbare Images.
+
+# Virtuelle Umgebungen & Tool-Caches
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# Tests werden im Image nicht benötigt (Gate läuft in CI/lokal)
+tests/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env-Dateien nie ins Image backen
+.env
+.env.*
+!.env.example
