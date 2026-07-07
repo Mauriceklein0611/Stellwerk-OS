@@ -139,10 +139,64 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  # Trivy: scannt das gebaute Kern-Image; failt bei behebbaren HIGH/CRITICAL.
+  trivy:
+    needs: changes
+    if: >-
+      needs.changes.outputs.core == 'true'
+      || needs.changes.outputs.docker == 'true'
+      || github.ref == 'refs/heads/main'
+      || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Kern-Image bauen (in den Daemon laden)
+        uses: docker/build-push-action@v6
+        with:
+          context: services/core
+          load: true
+          tags: stellwerk-core:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Trivy-Scan (fail bei behebbaren HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: stellwerk-core:ci
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true       # nur Findings mit verfügbarem Fix blocken
+          exit-code: "1"
+          trivyignores: .trivyignore
+          format: table
+
+  # Lizenz-Report (npm + pip) – rein informativ, blockiert nie.
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/core/uv.lock
+      - name: Python-Lizenzen (pip-licenses)
+        working-directory: services/core
+        run: |
+          uv sync --frozen
+          echo '## Python-Lizenzen (services/core)' >> "$GITHUB_STEP_SUMMARY"
+          uv run --with pip-licenses pip-licenses --format=markdown --with-urls \
+            >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: npm-Lizenzen (license-checker)
+        run: |
+          echo '## npm-Lizenzen (root)' >> "$GITHUB_STEP_SUMMARY"
+          npx --yes license-checker --summary >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+
   # Sammel-Gate: EIN required check für Branch-Protection. Übersprungene Jobs
   # (Pfadfilter) sind ok, nur echte Fehler/Abbrüche lassen ihn scheitern.
   ci-ok:
-    needs: [changes, core, pms, docker]
+    needs: [changes, core, pms, docker, trivy]
     if: always()
     runs-on: ubuntu-latest
     steps:

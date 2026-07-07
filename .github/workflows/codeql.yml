@@ -1,0 +1,38 @@
+# CodeQL-Sicherheitsanalyse (js/ts + python), bei PR, push nach main und wöchentlich.
+name: codeql
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [dev, main]
+  schedule:
+    - cron: "27 3 * * 1"   # montags 03:27 UTC
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write   # nötig, um Findings in den Security-Tab zu schreiben
+    strategy:
+      fail-fast: false
+      matrix:
+        # js/ts wird mit #10 (Einzug von apps/pm-studio) ergänzt – aktuell gibt
+        # es keine JS/TS-Quellen, CodeQL würde sonst mit "no source" scheitern.
+        language: [python]
+    steps:
+      - uses: actions/checkout@v4
+      - name: CodeQL initialisieren
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - name: Analyse
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

@@ -1,0 +1,8 @@
+# Trivy-Ausnahmen – nur mit Begründung und, wenn möglich, Ablaufdatum.
+# Format: eine CVE-ID pro Zeile, darüber ein Kommentar mit Grund.
+#
+# Beispiel:
+# # CVE-2024-XXXXX: nur in ungenutztem Codepfad von <paket>; Fix in vX erwartet.
+# CVE-2024-XXXXX
+#
+# Derzeit keine Ausnahmen.
