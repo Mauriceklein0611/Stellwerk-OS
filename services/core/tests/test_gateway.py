@@ -13,6 +13,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.gateway import get_gateway_provider
+from app.db.session import get_session
 from app.gateway.base import ChatMessage, ChatResult
 from app.gateway.errors import ProviderError, ProviderTimeoutError
 from app.gateway.ollama import OllamaProvider
@@ -20,6 +21,7 @@ from app.gateway.registry import GatewayConfigError, build_provider
 from app.gateway.stub import StubProvider
 from app.main import create_app
 from app.settings import Settings
+from tests._dbstub import override_get_session
 
 CHAT_URL = "/api/v1/gateway/chat"
 
@@ -31,6 +33,7 @@ def _body(model: str = "stub-echo") -> dict[str, object]:
 def _client_with_provider(provider: StubProvider) -> Iterator[TestClient]:
     app = create_app()
     app.dependency_overrides[get_gateway_provider] = lambda: provider
+    app.dependency_overrides[get_session] = override_get_session
     with TestClient(app) as client:
         yield client
 

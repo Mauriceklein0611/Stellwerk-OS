@@ -7,7 +7,9 @@ from fastapi.responses import JSONResponse
 
 from app.api.gateway import router as gateway_router
 from app.api.health import router as health_router
+from app.api.metrics import router as metrics_router
 from app.api.router import api_v1
+from app.api.telemetry import router as telemetry_router
 from app.gateway.errors import GatewayError
 from app.logging import configure_logging
 from app.middleware import RequestIdMiddleware
@@ -32,6 +34,8 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIdMiddleware)
     app.add_exception_handler(GatewayError, _gateway_error_handler)
     app.include_router(health_router)
+    app.include_router(metrics_router)
     app.include_router(api_v1)
     app.include_router(gateway_router, prefix="/api/v1")
+    app.include_router(telemetry_router, prefix="/api/v1")
     return app
