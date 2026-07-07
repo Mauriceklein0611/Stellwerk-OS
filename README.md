@@ -29,15 +29,42 @@ erfüllen (kein eigenes Login, alle LLM-Calls über den Gateway, Audit-Pflicht).
 
 ## Quickstart
 
-> ⏳ Platzhalter – vollständige Ein-Befehl-Installation folgt mit v0.1 (Issue #5).
+Voraussetzung: Docker (mit Compose v2). Zwei Befehle bis zur laufenden Plattform:
 
 ```bash
 cp .env.example .env
-make up          # kommt mit Issue #5 (Compose-Profile + Makefile)
+make up          # baut & startet Kern + Postgres, migriert automatisch
 ```
 
-Aktuell steht das Repo-Grundgerüst; die einzelnen Bausteine werden über
-GitHub-Issues des Milestones **v0.1 Foundation** aufgebaut.
+Danach:
+
+- Health: <http://localhost:8000/healthz> → `{"status":"ok"}`
+- Readiness (inkl. DB): <http://localhost:8000/readyz> → `{"status":"ready"}`
+- API-Docs: <http://localhost:8000/docs>
+
+Weitere Befehle (`make help` zeigt alle):
+
+```bash
+make seed        # Demo-/Basisdaten in platform_info (idempotent)
+make logs        # Logs folgen
+make down        # stoppen (benannte Volumes bleiben erhalten)
+```
+
+Optionale Profile:
+
+```bash
+docker compose --profile llm up -d          # zusätzlich Ollama (lokale Modelle)
+# monitoring-Profil ist reserviert und wird in Issue #12 gefüllt
+```
+
+Produktions-Overlay (Restart-Policy, Ressourcen-Limits, Log-Rotation):
+
+```bash
+docker compose -f docker-compose.yml -f compose.prod.yml --profile core up -d
+```
+
+Das Repo-Grundgerüst und die einzelnen Bausteine entstehen über GitHub-Issues des
+Milestones **v0.1 Foundation**.
 
 ## Doku & Arbeitsweise
 

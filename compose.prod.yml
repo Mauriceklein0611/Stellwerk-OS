@@ -1,0 +1,48 @@
+# Stellwerk – Produktions-Overlay.
+#
+# Anwendung (zusätzlich zur Basis):
+#   docker compose -f docker-compose.yml -f compose.prod.yml --profile core up -d
+#
+# Härtung gegenüber der Basis:
+#   * keine Bind-Mounts (nur benannte Volumes – die Basis nutzt bereits keine)
+#   * restart: unless-stopped für alle Langläufer
+#   * Ressourcen-Limits (CPU/Memory)
+#   * Log-Rotation (json-file, begrenzte Größe/Anzahl)
+
+x-logging: &prod-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    restart: unless-stopped
+    logging: *prod-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1g
+
+  migrate:
+    # Einmal-Job: nicht neustarten, aber Logs ebenfalls rotieren.
+    restart: "no"
+    logging: *prod-logging
+
+  core:
+    restart: unless-stopped
+    logging: *prod-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m
+
+  ollama:
+    restart: unless-stopped
+    logging: *prod-logging
+    deploy:
+      resources:
+        limits:
+          memory: 4g
