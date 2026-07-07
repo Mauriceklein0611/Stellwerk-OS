@@ -29,6 +29,23 @@ class Settings(BaseSettings):
     # Persistenz (SQLAlchemy 2 + psycopg3-Treiber).
     database_url: str = "postgresql+psycopg://stw:stw@localhost:5432/stellwerk"
 
+    # --- Model Gateway (ADR-006) ---
+    # Aktiver Provider: ``stub`` (deterministisch, für alle Tests) oder ``ollama``.
+    gateway_provider: str = "stub"
+    # Modell-Allowlist (CSV); nur diese Modelle sind über den Gateway erlaubt.
+    gateway_models: str = "stub-echo,llama3.2"
+    # Basis-URL des Ollama-Servers (nur für den ollama-Provider relevant).
+    ollama_url: str = "http://localhost:11434"
+    # Timeout/Retry-Verhalten des ollama-Providers.
+    gateway_timeout_s: float = 30.0
+    gateway_retries: int = 2
+    gateway_backoff_s: float = 0.5
+
+    @property
+    def allowed_models(self) -> list[str]:
+        """Modell-Allowlist als Liste (aus der CSV ``gateway_models``)."""
+        return [m.strip() for m in self.gateway_models.split(",") if m.strip()]
+
 
 @lru_cache
 def get_settings() -> Settings:

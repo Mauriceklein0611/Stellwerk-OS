@@ -62,8 +62,8 @@ services:
     environment:
       # Überschreibt den localhost-Wert aus .env für den Container-Netzwerkfall.
       <<: *core-db-url
-      # Ollama-Basis (vom Gateway ab #6 genutzt; heute nur Verdrahtung).
-      STW_OLLAMA_BASE_URL: http://ollama:11434
+      # Ollama-Basis für den Model Gateway (Provider=ollama, ADR-006).
+      STW_OLLAMA_URL: http://ollama:11434
     ports:
       - "${CORE_PORT:-8000}:8000"
     depends_on:
