@@ -23,9 +23,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # js/ts wird mit #10 (Einzug von apps/pm-studio) ergänzt – aktuell gibt
-        # es keine JS/TS-Quellen, CodeQL würde sonst mit "no source" scheitern.
-        language: [python]
+        # python (services/core) + js/ts (apps/pm-studio, eingezogen mit #10).
+        language: [python, javascript-typescript]
     steps:
       - uses: actions/checkout@v4
       - name: CodeQL initialisieren

@@ -1,0 +1,13 @@
+# Next.js / Build
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Tests
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# Node
+node_modules/
