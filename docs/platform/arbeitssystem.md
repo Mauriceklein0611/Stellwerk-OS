@@ -274,3 +274,52 @@ zweiter Wahrheit) – und am Ende zeigst du ein Produkt, das seine eigene
 Entwicklung verwaltet. Das ist dieselbe Diskussion, die Unternehmen bei
 „Octane vs. Jira vs. GitHub" real führen, nur dass du sie mit einer
 funktionierenden Antwort beendest.
+
+---
+
+## 10. So sieht es live aus (Ist-Stand, verbindliche Kommandos)
+
+Dieser Abschnitt dokumentiert das real eingerichtete System (Issue #2).
+
+### Labels, Milestone, Issues
+
+Angelegt per `scripts/bootstrap-github.sh` (idempotent):
+
+- **Module:** `module:platform|core|pms|idp|leitstand|rag|flow`
+- **Typen:** `type:feat|fix|docs|chore|refactor|test`
+- **Priorität:** `prio:p0|p1|p2|p3` · **Größe:** `size:S|M|L` · **`triage`**
+- **Milestone:** `v0.1 Foundation` mit den zwölf Start-Issues.
+
+```bash
+gh issue list --milestone "v0.1 Foundation"      # Backlog des Releases
+gh issue list --label "module:core" --state open # je Modul
+gh issue view 3 --comments                        # Stand/Hand-off IMMER mitlesen
+```
+
+### Issue-Formular erzwingt das Task-Format
+
+`.github/ISSUE_TEMPLATE/task.yml` verlangt Modul/Typ/Priorität/Größe/Ziel/
+Anforderungen/AK als Pflichtfelder; `config.yml` setzt
+`blank_issues_enabled: false` – leere Issues sind damit deaktiviert, jedes neue
+Issue folgt dem Stellwerk-Format.
+
+### Label-Wächter (Automation)
+
+`.github/workflows/label-guard.yml` prüft bei jedem Issue-Event: fehlt ein
+`module:*`-Label, wird automatisch `triage` gesetzt und ein Hinweis-Kommentar
+angelegt. Sobald ein Modul-Label vergeben wird, entfernt sich `triage` wieder.
+
+### Projects-v2-Board (manueller UI-Schritt)
+
+Das Board „Stellwerk" mit Status-Feld **Backlog → Ready → In Progress → In
+Review → Done** wird einmalig in der GitHub-UI angelegt (Projects-v2-Workflows
+sind nicht per API/CLI setzbar). Zu aktivierende Built-in-Workflows:
+
+- **Auto-add to project** – neues Issue landet automatisch im Board (Backlog).
+- **Item added → Status: Backlog** (Startspalte).
+- **Pull request linked/merged → In Review bzw. Done.**
+- **Item closed → Done.**
+
+Verifikation (AK Issue #2): Test-Issue über das Formular anlegen → erscheint mit
+korrekten Labels in *Backlog*; PR mit `Closes #N` schiebt es nach *In Review*
+und schließt es beim Merge (→ *Done*).
