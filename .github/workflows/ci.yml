@@ -80,7 +80,35 @@ jobs:
       - run: uv run mypy app
       - run: uv run alembic upgrade head
       - run: uv run pytest
-      # Issue #11 ergänzt hier: make contracts + git diff --exit-code packages/contracts
+      # Contract-Drift wird im eigenen Job `contracts` geprüft (braucht Node).
+
+  # Contract-Drift: OpenAPI neu exportieren + TS generieren; weicht das
+  # eingecheckte packages/contracts ab, bricht der Build mit klarer Meldung.
+  contracts:
+    needs: changes
+    if: needs.changes.outputs.contracts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/core/uv.lock
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: uv sync --frozen
+        working-directory: services/core
+      - name: Contracts neu generieren
+        run: make contracts
+      - name: Drift-Check (packages/contracts)
+        run: |
+          if ! git diff --exit-code -- packages/contracts; then
+            echo "::error::packages/contracts weicht vom Kern-OpenAPI ab. Bitte 'make contracts' ausführen und committen."
+            exit 1
+          fi
 
   # TS-Gate für PM Studio. Läuft erst, sobald apps/pm-studio existiert (#10).
   pms:
@@ -160,14 +188,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Trivy-Scan (fail bei behebbaren HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: stellwerk-core:ci
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true       # nur Findings mit verfügbarem Fix blocken
-          exit-code: "1"
-          trivyignores: .trivyignore
-          format: table
+        # Direkt über das offizielle Image – robuster als die Action, deren
+        # interne setup-trivy-Pins schon mehrfach gebrochen waren.
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/.trivyignore:/.trivyignore" \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            --ignorefile /.trivyignore --scanners vuln \
+            stellwerk-core:ci
 
   # Lizenz-Report (npm + pip) – rein informativ, blockiert nie.
   licenses:
@@ -196,7 +226,7 @@ jobs:
   # Sammel-Gate: EIN required check für Branch-Protection. Übersprungene Jobs
   # (Pfadfilter) sind ok, nur echte Fehler/Abbrüche lassen ihn scheitern.
   ci-ok:
-    needs: [changes, core, pms, docker, trivy]
+    needs: [changes, core, contracts, pms, docker, trivy]
     if: always()
     runs-on: ubuntu-latest
     steps:

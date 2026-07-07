@@ -40,5 +40,7 @@ test: ## Kern-Testsuite lokal ausführen (uv erforderlich)
 lint: ## Ruff + mypy über den Kern (uv erforderlich)
 	cd $(CORE_DIR) && $(UV) run ruff check . && $(UV) run mypy app
 
-contracts: ## Platzhalter – OpenAPI→TS-Contract-Pipeline kommt mit #11
-	@echo "contracts: Platzhalter – wird in Issue #11 (Contract-Pipeline) umgesetzt."
+contracts: ## OpenAPI aus dem Kern exportieren + TS-Typen generieren + bauen (eincheckbar)
+	cd $(CORE_DIR) && $(UV) run python -m app.export_openapi > ../../packages/contracts/openapi.json
+	npm run generate -w @stellwerk/contracts
+	npm run build -w @stellwerk/contracts
