@@ -1,0 +1,156 @@
+# Stellwerk Monorepo-CI (#8): pfadgefiltert, TS+PY-Gates, Docker-Build, GHCR-Push.
+# Jeder PR nach dev/main wird geprüft – aber nur, was sich geändert hat.
+# main-Merges (und Tags) bauen und pushen versionierte Images nach GHCR.
+name: ci
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Ermittelt, welche Bereiche der PR berührt – nur die laufen anschließend.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      core: ${{ steps.f.outputs.core }}
+      pms: ${{ steps.f.outputs.pms }}
+      contracts: ${{ steps.f.outputs.contracts }}
+      docker: ${{ steps.f.outputs.docker }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: f
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            core:
+              - 'services/core/**'
+              - 'packages/contracts/**'
+            pms:
+              - 'apps/pm-studio/**'
+            contracts:
+              - 'packages/contracts/**'
+              - 'services/core/app/**'
+            docker:
+              - '**/Dockerfile'
+              - 'docker-compose.yml'
+              - 'compose.prod.yml'
+
+  # Python-Gate des Kerns inkl. echtem Postgres (DB-Tests reproduzierbar).
+  core:
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: stw
+          POSTGRES_PASSWORD: stw
+          POSTGRES_DB: stellwerk
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U stw"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      STW_DATABASE_URL: postgresql+psycopg://stw:stw@localhost:5432/stellwerk
+      # Aktiviert die env-gegateten DB-Tests (test_db, test_telemetry_db).
+      STW_TEST_DATABASE_URL: postgresql+psycopg://stw:stw@localhost:5432/stellwerk
+      STW_GATEWAY_PROVIDER: stub   # ADR-006: CI ruft nie echte LLMs
+    defaults:
+      run:
+        working-directory: services/core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: services/core/uv.lock
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run mypy app
+      - run: uv run alembic upgrade head
+      - run: uv run pytest
+      # Issue #11 ergänzt hier: make contracts + git diff --exit-code packages/contracts
+
+  # TS-Gate für PM Studio. Läuft erst, sobald apps/pm-studio existiert (#10).
+  pms:
+    needs: changes
+    if: needs.changes.outputs.pms == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint -w @stellwerk/pm-studio
+      - run: npx tsc --noEmit -p apps/pm-studio
+      - run: npm run test -w @stellwerk/pm-studio
+      - run: npm run build -w @stellwerk/pm-studio
+
+  # Docker-Build der Kern-Dockerfile; Push nur auf main/Tags (GHCR).
+  docker:
+    needs: changes
+    if: >-
+      needs.changes.outputs.docker == 'true'
+      || github.ref == 'refs/heads/main'
+      || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write   # minimal: Schreibrecht auf Packages nur hier
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Login GHCR (nur push auf main/Tags)
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Metadaten/Tags (sha + semver)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}/core
+          tags: |
+            type=sha
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+      - name: Build (Push nur auf push-Events)
+        uses: docker/build-push-action@v6
+        with:
+          context: services/core
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Sammel-Gate: EIN required check für Branch-Protection. Übersprungene Jobs
+  # (Pfadfilter) sind ok, nur echte Fehler/Abbrüche lassen ihn scheitern.
+  ci-ok:
+    needs: [changes, core, pms, docker]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ergebnisse prüfen
+        run: |
+          echo '${{ toJSON(needs) }}'
+          if ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}; then
+            echo "Mindestens ein Job ist fehlgeschlagen oder wurde abgebrochen."
+            exit 1
+          fi
+          echo "Alle relevanten Jobs grün (übersprungene zählen als ok)."
