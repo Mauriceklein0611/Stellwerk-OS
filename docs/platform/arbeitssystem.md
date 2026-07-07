@@ -1,3 +1,10 @@
+---
+module: platform
+type: guide
+status: current
+updated: 2026-07-07
+---
+
 # Stellwerk Arbeitssystem v2 – Tickets, Doku und Wissensfluss
 
 > Ergänzt `vision-stellwerk.md`. Regelt, wie das bewährte Task-/Doku-System aus

@@ -1,3 +1,10 @@
+---
+module: platform
+type: vision
+status: current
+updated: 2026-07-07
+---
+
 # Stellwerk – Open-Source Enterprise AI Platform
 
 > Arbeitstitel gemäß ADR-001 (unten). Der Name ist im gesamten Dokument per
