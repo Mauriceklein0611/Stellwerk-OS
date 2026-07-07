@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     # DevAuth-Rolle (ADR-007): statischer Nutzer, Rolle per Env umschaltbar.
     dev_role: str = "admin"
+    # Persistenz (SQLAlchemy 2 + psycopg3-Treiber).
+    database_url: str = "postgresql+psycopg://stw:stw@localhost:5432/stellwerk"
 
 
 @lru_cache

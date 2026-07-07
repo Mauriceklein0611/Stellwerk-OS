@@ -7,16 +7,19 @@ from collections.abc import Iterator
 import pytest
 from fastapi.testclient import TestClient
 
+from app.db.session import reset_engine
 from app.main import create_app
 from app.settings import get_settings
 
 
 @pytest.fixture(autouse=True)
-def _clear_settings_cache() -> Iterator[None]:
-    """Settings-Cache je Test leeren, damit Env-Overrides greifen."""
+def _reset_state() -> Iterator[None]:
+    """Settings-Cache und DB-Engine je Test zurücksetzen (Env-Overrides greifen)."""
     get_settings.cache_clear()
+    reset_engine()
     yield
     get_settings.cache_clear()
+    reset_engine()
 
 
 @pytest.fixture
