@@ -188,14 +188,16 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Trivy-Scan (fail bei behebbaren HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@v0.28.0
-        with:
-          image-ref: stellwerk-core:ci
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true       # nur Findings mit verfügbarem Fix blocken
-          exit-code: "1"
-          trivyignores: .trivyignore
-          format: table
+        # Direkt über das offizielle Image – robuster als die Action, deren
+        # interne setup-trivy-Pins schon mehrfach gebrochen waren.
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v "$PWD/.trivyignore:/.trivyignore" \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            --ignorefile /.trivyignore --scanners vuln \
+            stellwerk-core:ci
 
   # Lizenz-Report (npm + pip) – rein informativ, blockiert nie.
   licenses:

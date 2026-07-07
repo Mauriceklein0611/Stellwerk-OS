@@ -54,7 +54,7 @@
         "type": "object"
       },
       "ChatResult": {
-        "description": "Normalisiertes Ergebnis eines Chat-Aufrufs – providerunabhängig.",
+        "description": "Normalisiertes Ergebnis eines Chat-Aufrufs â€“ providerunabhÃ¤ngig.",
         "properties": {
           "content": {
             "title": "Content",
@@ -254,7 +254,7 @@
   "paths": {
     "/api/v1/gateway/chat": {
       "post": {
-        "description": "Führt einen Chat-Aufruf über den konfigurierten Provider aus.",
+        "description": "FÃ¼hrt einen Chat-Aufruf Ã¼ber den konfigurierten Provider aus.",
         "operationId": "chat_api_v1_gateway_chat_post",
         "requestBody": {
           "content": {
@@ -296,7 +296,7 @@
     },
     "/api/v1/me": {
       "get": {
-        "description": "Gibt den aktuell authentifizierten Nutzer zurück (DevAuth in v0.1).",
+        "description": "Gibt den aktuell authentifizierten Nutzer zurÃ¼ck (DevAuth in v0.1).",
         "operationId": "me_api_v1_me_get",
         "responses": {
           "200": {
@@ -315,7 +315,7 @@
     },
     "/api/v1/telemetry/summary": {
       "get": {
-        "description": "Summen je Modell über die letzten ``days`` Tage.",
+        "description": "Summen je Modell Ã¼ber die letzten ``days`` Tage.",
         "operationId": "summary_api_v1_telemetry_summary_get",
         "parameters": [
           {
@@ -361,7 +361,7 @@
     },
     "/healthz": {
       "get": {
-        "description": "Liveness: reine Prozess-Antwort, keine Abhängigkeiten.",
+        "description": "Liveness: reine Prozess-Antwort, keine AbhÃ¤ngigkeiten.",
         "operationId": "healthz_healthz_get",
         "responses": {
           "200": {

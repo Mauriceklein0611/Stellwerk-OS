@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Chat
-         * @description F�hrt einen Chat-Aufruf �ber den konfigurierten Provider aus.
+         * @description Führt einen Chat-Aufruf über den konfigurierten Provider aus.
          */
         post: operations["chat_api_v1_gateway_chat_post"];
         delete?: never;
@@ -33,7 +33,7 @@ export interface paths {
         };
         /**
          * Me
-         * @description Gibt den aktuell authentifizierten Nutzer zur�ck (DevAuth in v0.1).
+         * @description Gibt den aktuell authentifizierten Nutzer zurück (DevAuth in v0.1).
          */
         get: operations["me_api_v1_me_get"];
         put?: never;
@@ -53,7 +53,7 @@ export interface paths {
         };
         /**
          * Summary
-         * @description Summen je Modell �ber die letzten ``days`` Tage.
+         * @description Summen je Modell über die letzten ``days`` Tage.
          */
         get: operations["summary_api_v1_telemetry_summary_get"];
         put?: never;
@@ -73,7 +73,7 @@ export interface paths {
         };
         /**
          * Healthz
-         * @description Liveness: reine Prozess-Antwort, keine Abh�ngigkeiten.
+         * @description Liveness: reine Prozess-Antwort, keine Abhängigkeiten.
          */
         get: operations["healthz_healthz_get"];
         put?: never;
@@ -157,7 +157,7 @@ export interface components {
         };
         /**
          * ChatResult
-         * @description Normalisiertes Ergebnis eines Chat-Aufrufs � providerunabh�ngig.
+         * @description Normalisiertes Ergebnis eines Chat-Aufrufs – providerunabhängig.
          */
         ChatResult: {
             /** Content */

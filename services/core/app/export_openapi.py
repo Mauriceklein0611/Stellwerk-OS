@@ -19,8 +19,10 @@ def build_openapi() -> dict[str, object]:
 
 
 def main() -> None:
-    json.dump(build_openapi(), sys.stdout, indent=2, sort_keys=True, ensure_ascii=False)
-    sys.stdout.write("\n")
+    # Bytes explizit als UTF-8 schreiben – unabhängig von der Konsolen-Codepage
+    # (Windows würde sonst cp1252 nehmen und Umlaute plattformabhängig machen).
+    payload = json.dumps(build_openapi(), indent=2, sort_keys=True, ensure_ascii=False)
+    sys.stdout.buffer.write((payload + "\n").encode("utf-8"))
 
 
 if __name__ == "__main__":
