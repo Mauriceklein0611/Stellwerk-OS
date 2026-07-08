@@ -20,7 +20,7 @@ erfüllen (kein eigenes Login, alle LLM-Calls über den Gateway, Audit-Pflicht).
 
 | Modul | Inhalt | Reifegrad |
 |---|---|---|
-| **PM Studio** (`apps/pm-studio`) | Agentisches Projektmanagement | Tier 1 – in Arbeit |
+| **PM Studio** (`apps/pm-studio`) | Agentisches Projektmanagement | Tier 1 – eingezogen (aus [projectmind-os](https://github.com/Mauriceklein0611/projectmind-os)) |
 | **Kern** (`services/core`) | Identity, Gateway, Telemetrie, Audit, Eval, Runtime | Tier 1 – als Nächstes |
 | **IDP** | Dokumentenpipeline OCR → LLM → strukturierte Daten | Tier 2 |
 | **Leitstand** | Governance- & Analytics-Dashboard | Tier 2 |
@@ -79,9 +79,12 @@ Feature-Branch/PR (`Closes #N`).
 
 ## Herkunft
 
-PM Studio entstand als eigenständiges Projekt (Tags v0.1–v0.5) und wird als erste
-App in dieses Monorepo eingezogen (Issue #10). Das Alt-Repo wird archiviert und
-hier verlinkt, sobald der Einzug erfolgt ist.
+PM Studio entstand als eigenständiges Projekt
+([projectmind-os](https://github.com/Mauriceklein0611/projectmind-os), Tags
+v0.1–v0.5) und wurde mit Issue #10 als erste App in dieses Monorepo eingezogen
+(`apps/pm-studio`) – reiner Umzug, keine Feature-Änderung. Die vollständige
+Historie liegt im (zu archivierenden) Alt-Repo; die frozen-Alt-Doku unter
+[docs/pm-studio/](docs/pm-studio/).
 
 ## Lizenz
 

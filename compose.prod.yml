@@ -46,3 +46,12 @@ services:
       resources:
         limits:
           memory: 4g
+
+  pms:
+    restart: unless-stopped
+    logging: *prod-logging
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512m

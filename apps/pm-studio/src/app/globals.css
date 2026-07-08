@@ -1,0 +1,153 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Color, font and radius tokens.
+ * Single source of truth: docs/design-system.md.
+ *
+ * shadcn/ui semantic tokens (primary, card, muted, …) are mapped onto our
+ * brand palette below, so our own utilities (bg-surface, text-muted, …) and
+ * shadcn components (bg-primary, bg-card, …) all read from one place.
+ */
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+
+  /* Agent / status palette (single source for <StatusBadge>) */
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-idle: var(--idle);
+  --color-running: var(--running);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/*
+ * Theme tokens (TASK-029). `:root` carries the Light palette, `.dark` the Dark
+ * palette; the `.dark` class on <html> is toggled at runtime (no-flash script +
+ * settings store). Dark remains the default. Single source: docs/design-system.md.
+ *
+ * Status colors are tuned per theme: the dark palette uses light pastels, the
+ * light palette uses richer shades so `text-<status>` stays readable on light
+ * surfaces (StatusBadge renders text + `/10` background from the same token).
+ */
+:root {
+  --radius: 0.625rem;
+
+  --background: #f7f7fa;
+  --foreground: #1a1a22;
+  --surface: #ffffff;
+  --surface-hover: #f0f0f4;
+
+  --card: #ffffff;
+  --card-foreground: #1a1a22;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a22;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: #ececf1;
+  --secondary-foreground: #1a1a22;
+
+  --muted: #5f5f6b;
+  --muted-foreground: #5f5f6b;
+  --accent: #0891b2;
+  --accent-foreground: #ffffff;
+
+  --border: #e3e3ea;
+  --input: #e3e3ea;
+  --ring: #6366f1;
+  --destructive: #dc2626;
+
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #2563eb;
+  --idle: #6b7280;
+  --running: #6366f1;
+}
+
+.dark {
+  --background: #0a0a0f;
+  --foreground: #e7e7ea;
+  --surface: #13131a;
+  --surface-hover: #1b1b24;
+
+  --card: #13131a;
+  --card-foreground: #e7e7ea;
+  --popover: #13131a;
+  --popover-foreground: #e7e7ea;
+
+  --primary: #6366f1;
+  --primary-foreground: #ffffff;
+  --secondary: #1b1b24;
+  --secondary-foreground: #e7e7ea;
+
+  --muted: #8b8b96;
+  --muted-foreground: #8b8b96;
+  --accent: #22d3ee;
+  --accent-foreground: #0a0a0f;
+
+  --border: #26262f;
+  --input: #26262f;
+  --ring: #6366f1;
+  --destructive: #f87171;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #60a5fa;
+  --idle: #6b7280;
+  --running: #818cf8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* UI base size per design-system.md */
+    font-size: 0.875rem;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
