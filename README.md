@@ -54,8 +54,12 @@ Optionale Profile:
 
 ```bash
 docker compose --profile llm up -d          # zusätzlich Ollama (lokale Modelle)
-# monitoring-Profil ist reserviert und wird in Issue #12 gefüllt
+docker compose --profile monitoring up -d   # Prometheus + Grafana (Dashboards vorprovisioniert)
 ```
+
+Monitoring-Dashboards nach dem Start: Grafana <http://localhost:3001>
+(„Plattform" und „Modelle & Kosten"), Prometheus <http://localhost:9090>.
+Details: [docs/runbooks/monitoring.md](docs/runbooks/monitoring.md).
 
 Produktions-Overlay (Restart-Policy, Ressourcen-Limits, Log-Rotation):
 

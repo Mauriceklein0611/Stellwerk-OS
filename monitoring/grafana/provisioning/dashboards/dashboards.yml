@@ -1,0 +1,13 @@
+# Grafana-Dashboard-Provisioning: lädt die JSON-Dashboards aus dem Volume.
+apiVersion: 1
+
+providers:
+  - name: stellwerk
+    orgId: 1
+    folder: Stellwerk
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

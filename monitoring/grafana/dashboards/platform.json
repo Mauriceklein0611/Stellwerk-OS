@@ -1,0 +1,81 @@
+{
+  "uid": "stw-platform",
+  "title": "Plattform",
+  "tags": ["stellwerk"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Core erreichbar",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "up{job=\"stellwerk-core\"}", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "down", "color": "red" }, "1": { "text": "up", "color": "green" } } }
+          ],
+          "thresholds": { "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Gateway-Calls (gesamt)",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum(stw_gateway_calls_total)", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Fehler (gesamt)",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum(stw_gateway_errors_total)", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
+      "fieldConfig": {
+        "defaults": { "unit": "short", "thresholds": { "steps": [ { "color": "green", "value": null }, { "color": "red", "value": 1 } ] } },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Gateway-Latenz p95 (ms)",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.95, sum(rate(stw_gateway_latency_ms_bucket[5m])) by (le))", "legendFormat": "p95", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Gateway-Calls/s nach Status",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (status) (rate(stw_gateway_calls_total[5m]))", "legendFormat": "{{status}}", "datasource": { "type": "prometheus", "uid": "prometheus" } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    }
+  ]
+}
