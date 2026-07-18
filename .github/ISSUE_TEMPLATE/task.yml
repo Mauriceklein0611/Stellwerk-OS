@@ -1,0 +1,53 @@
+name: Task
+description: Standard-Arbeitsauftrag (Stellwerk-Format)
+title: "[MODUL] Kurztitel"
+labels: ["triage"]
+body:
+  - type: dropdown
+    id: module
+    attributes:
+      label: Modul
+      options: [platform, core, pms, idp, leitstand, rag, flow]
+    validations: { required: true }
+  - type: dropdown
+    id: type
+    attributes:
+      label: Typ
+      options: [feat, fix, docs, chore, refactor, test]
+    validations: { required: true }
+  - type: dropdown
+    id: prio
+    attributes:
+      label: Priorität
+      options: [p0, p1, p2, p3]
+    validations: { required: true }
+  - type: dropdown
+    id: size
+    attributes:
+      label: Größe
+      options: [S, M, L]
+    validations: { required: true }
+  - type: textarea
+    id: ziel
+    attributes: { label: Ziel, description: Was soll danach möglich/wahr sein? }
+    validations: { required: true }
+  - type: textarea
+    id: kontext
+    attributes: { label: Kontext, description: Warum jetzt, worauf baut es auf, relevante Docs/ADRs }
+  - type: textarea
+    id: anforderungen
+    attributes: { label: Technische Anforderungen, description: Betroffene Dateien/Pfade, verbindliche Vorgaben }
+    validations: { required: true }
+  - type: textarea
+    id: ak
+    attributes:
+      label: Akzeptanzkriterien
+      description: Checkboxen, einzeln prüfbar; Gate + Testkonzept sind Pflicht-AK
+      value: |
+        - [ ] …
+        - [ ] Qualitäts-Gate grün (Lint/Types/Tests/Build der betroffenen Workspaces)
+        - [ ] tests/issue-N/testkonzept.md erstellt/aktualisiert
+    validations: { required: true }
+  - type: input
+    id: deps
+    attributes: { label: Hängt ab von, placeholder: "#3, #4" }

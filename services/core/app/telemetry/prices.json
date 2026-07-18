@@ -1,0 +1,20 @@
+{
+  "currency": "USD",
+  "unit": "per_1k_tokens",
+  "note": "Preise je 1000 Tokens mit Gueltigkeitszeitraeumen (valid_from inklusive, valid_to exklusiv, null = offen). Muster: azure_openai_prices.json. Lokale Modelle tragen simulated=true und dienen nur der Demo/FinOps-Simulation.",
+  "models": {
+    "gpt-4o": [
+      {"valid_from": "2024-01-01", "valid_to": "2025-01-01", "prompt": 0.005, "completion": 0.015, "simulated": false},
+      {"valid_from": "2025-01-01", "valid_to": null, "prompt": 0.0025, "completion": 0.010, "simulated": false}
+    ],
+    "gpt-4o-mini": [
+      {"valid_from": "2024-07-01", "valid_to": null, "prompt": 0.00015, "completion": 0.0006, "simulated": false}
+    ],
+    "llama3.2": [
+      {"valid_from": "2024-01-01", "valid_to": null, "prompt": 0.0002, "completion": 0.0004, "simulated": true}
+    ],
+    "stub-echo": [
+      {"valid_from": "2024-01-01", "valid_to": null, "prompt": 0.001, "completion": 0.002, "simulated": true}
+    ]
+  }
+}

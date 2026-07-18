@@ -1,0 +1,151 @@
+# Stellwerk – Basis-Compose (Entwicklung/Standard).
+#
+# Profile:
+#   core        (Default) Kern + Postgres + einmaliger Migrate-Job
+#   llm         zusätzlich Ollama (lokale Modelle)
+#   monitoring  Platzhalter, wird in #12 mit Prometheus/Grafana gefüllt
+#
+# Migrations-Strategie (CORE-ADR-001 / PR #5): ein eigener, kurzlebiger
+# `migrate`-Service führt `alembic upgrade head` aus und beendet sich. Der Kern
+# startet erst nach dessen erfolgreichem Abschluss
+# (`condition: service_completed_successfully`). Vorteile gegenüber einem
+# Entrypoint-Hook: die Migration läuft genau einmal (nicht pro Replica), der
+# Kern-Start bleibt schlank, und der Migrationsausgang ist im Job-Log isoliert.
+
+x-core-image: &core-image
+  build:
+    context: ./services/core
+    dockerfile: Dockerfile
+  image: stellwerk-core:dev
+
+# DB-URL, die die Container-Services nutzen (Host = Compose-Servicename `postgres`).
+x-core-db-url: &core-db-url
+  STW_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-stw}:${POSTGRES_PASSWORD:-stw}@postgres:5432/${POSTGRES_DB:-stellwerk}
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["core", "llm", "monitoring"]
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-stw}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stw}
+      POSTGRES_DB: ${POSTGRES_DB:-stellwerk}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-stw} -d ${POSTGRES_DB:-stellwerk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Kurzlebiger Job: Schema auf den aktuellen Stand bringen, dann beenden.
+  migrate:
+    <<: *core-image
+    profiles: ["core", "llm", "monitoring"]
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      <<: *core-db-url
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  core:
+    <<: *core-image
+    profiles: ["core", "llm", "monitoring"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Überschreibt den localhost-Wert aus .env für den Container-Netzwerkfall.
+      <<: *core-db-url
+      # Ollama-Basis für den Model Gateway (Provider=ollama, ADR-006).
+      STW_OLLAMA_URL: http://ollama:11434
+    ports:
+      - "${CORE_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=4).status==200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["llm"]
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # PM Studio (Next.js standalone). Eigenständige Fach-App (#10).
+  pms:
+    build:
+      context: .
+      dockerfile: apps/pm-studio/Dockerfile
+    image: stellwerk-pm-studio:dev
+    profiles: ["pms"]
+    ports:
+      - "${PMS_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # --- monitoring (Prometheus + Grafana) -------------------------------------
+  # Der Kern ist selbst im monitoring-Profil (s. o.), daher startet
+  # `--profile monitoring` auch Postgres/Migrate/Core und scrapt /metrics.
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    profiles: ["monitoring"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      core:
+        condition: service_healthy
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    profiles: ["monitoring"]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      # Anonymes Lesen optional (Betriebs-Dashboard); Editieren nur als Admin.
+      GF_AUTH_ANONYMOUS_ENABLED: "${GRAFANA_ANON_ENABLED:-true}"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  pgdata:
+  ollama-models:
+  prometheus-data:
+  grafana-data:

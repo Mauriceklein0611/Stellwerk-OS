@@ -1,0 +1,40 @@
+# Dependabot: wöchentliche, gruppierte Updates über alle Ökosysteme des Monorepos.
+version: 2
+updates:
+  # Node/npm – Root inkl. Workspaces (apps/*, packages/*).
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  # Python – Kern (pyproject.toml/uv.lock in services/core).
+  - package-ecosystem: pip
+    directory: "/services/core"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      py-minor-patch:
+        update-types: [minor, patch]
+
+  # GitHub-Actions in allen Workflows.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  # Basis-Images der Dockerfiles.
+  - package-ecosystem: docker
+    directory: "/services/core"
+    schedule:
+      interval: weekly
+    groups:
+      docker:
+        patterns: ["*"]

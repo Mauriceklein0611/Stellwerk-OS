@@ -1,0 +1,15 @@
+# Reproduzierbare Zeilenenden: Textdateien werden im Repo als LF normalisiert.
+* text=auto eol=lf
+
+# Dateien, die zwingend LF brauchen (make bricht bei CRLF in Rezeptzeilen;
+# Shell-/Compose-/Docker-Toolchain erwartet LF auch unter Windows-Checkout).
+Makefile        text eol=lf
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+
+# Binärdateien nicht anfassen.
+*.png binary
+*.jpg binary
+*.ico binary
