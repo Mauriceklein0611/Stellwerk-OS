@@ -1,7 +1,7 @@
 ---
 module: pm-studio
 type: doc
-status: frozen
+status: current
 imported: 2026-07-08
 source: projectmind-os
 ---

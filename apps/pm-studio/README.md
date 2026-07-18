@@ -10,8 +10,10 @@ Diese App wurde aus dem eigenständigen Vorgänger-Repo **projectmind-os**
 **reiner Umzug, keine Feature-Änderung**; nur Pfade/Configs wurden angepasst.
 
 Die vollständige Entwicklungshistorie (Commits/PRs) liegt weiterhin im
-archivierten Alt-Repo `Mauriceklein0611/projectmind-os`. Die frozen-Alt-Doku
-(inkl. Task-Index/-Archiv) liegt unter [`docs/pm-studio/`](../../docs/pm-studio/).
+archivierten Alt-Repo `Mauriceklein0611/projectmind-os`. Produkt-/Design-Doku:
+[`docs/pm-studio/`](../../docs/pm-studio/) (Index dort); historische Snapshots
+(Task-Index/-Archiv, Audit, alte Roadmap) unter
+[`docs/pm-studio/archive/`](../../docs/pm-studio/archive/).
 
 ## Entwicklung
 
