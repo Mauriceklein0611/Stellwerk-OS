@@ -198,6 +198,15 @@ Das kostet beim Schreiben nichts und ist später die Metadaten-Grundlage des
 RAG-Moduls: Filterung nach Modul, Ausblenden von `superseded`, Frische-Ranking
 über `updated`.
 
+> **Verbindlich seit #61:** Das vollständige Frontmatter-Schema (inkl.
+> `status: proposed`), die **Wahrheitshierarchie** und der **Pflegeprozess**
+> stehen in [documentation-policy.md](documentation-policy.md). Kernregel: Werden
+> Code, Vertrag, Konfiguration, Datenmodell, Sicherheitsgrenze, Nutzer- oder
+> Betriebsverhalten geändert, wird die betroffene Doku **im selben PR**
+> aktualisiert (Issue-/PR-Template fragt die Dokumentationsauswirkung ab). Die
+> Zukunft/Roadmap lebt in [roadmap.md](roadmap.md) (`proposed`) und wird nicht als
+> Ist-Architektur gelesen.
+
 ---
 
 ## 6. Wissensfluss ins RAG-Modul (Dogfooding)

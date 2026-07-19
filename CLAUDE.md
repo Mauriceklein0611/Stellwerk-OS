@@ -74,7 +74,14 @@ versionierte Images nach GHCR. Details: [docs/runbooks/ci.md](docs/runbooks/ci.m
 - **ADRs:** tragende Entscheidungen im PR begründen (Kandidat-ADR benennen).
 - **LLM-Zugriff nur über den Model Gateway** (`/api/v1/gateway/chat`, ADR-006);
   in Tests `STW_GATEWAY_PROVIDER=stub`.
-- **Doku als Code je Modul** mit YAML-Frontmatter (`status: current|frozen`).
+- **Doku als Code je Modul** mit YAML-Frontmatter
+  (`status: proposed|current|superseded|frozen`); Schema, Wahrheitshierarchie und
+  Pflegeprozess in [docs/platform/documentation-policy.md](docs/platform/documentation-policy.md).
+- **Doku-Update im selben PR:** Werden Code, Vertrag, Konfiguration, Datenmodell,
+  Sicherheitsgrenze, Nutzer- oder Betriebsverhalten geändert, wird die betroffene
+  Dokumentation **im selben PR** aktualisiert. Das PR-/Issue-Template fragt die
+  Dokumentationsauswirkung ab. Maschinelle Wahrheit (OpenAPI, `packages/contracts`,
+  Alembic, Settings, Testcode) wird in Markdown **erklärt/verlinkt, nie dupliziert**.
 
 ## Was NICHT erlaubt ist
 
