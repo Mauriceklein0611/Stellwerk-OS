@@ -67,7 +67,14 @@ updated: 2026-07-19        # ISO-Datum der letzten inhaltlichen Änderung
 ```
 
 **Optionale Felder:** `applies_to`, `owner`, `related_issues`, `related_adrs`,
-`supersedes`, `superseded_by`, `last_verified_release`.
+`related_services`, `supersedes`, `superseded_by`, `last_verified_release`,
+`last_reviewed`, `review_cycle`, `source_of_truth_for`, `update_triggers`.
+
+> Die vier Pflichtfelder (`module`, `type`, `status`, `updated`) sind die
+> operative Basis. Die zusätzlichen Governance-Felder (`owner`, `last_reviewed`,
+> `review_cycle`, `source_of_truth_for`, `update_triggers`, …) sind das in
+> [roadmap.md](roadmap.md) §8.4 beschriebene Zielbild und werden inkrementell über
+> Epic **E17** eingeführt; sie sind hier bereits als optionale Felder zulässig.
 
 ### Erlaubte `status`-Werte
 
