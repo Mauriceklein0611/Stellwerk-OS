@@ -28,9 +28,9 @@ jobs:
       docker: ${{ steps.f.outputs.docker }}
       docs: ${{ steps.f.outputs.docs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - id: f
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             core:
@@ -74,8 +74,8 @@ jobs:
       run:
         working-directory: services/core
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: services/core/uv.lock
@@ -93,12 +93,12 @@ jobs:
     if: needs.changes.outputs.contracts == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: services/core/uv.lock
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -120,8 +120,8 @@ jobs:
     if: needs.changes.outputs.pms == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -143,18 +143,18 @@ jobs:
       contents: read
       packages: write   # minimal: Schreibrecht auf Packages nur hier
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
       - name: Login GHCR (nur push auf main/Tags)
         if: github.event_name == 'push'
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Metadaten/Tags (sha + semver)
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository }}/core
           tags: |
@@ -162,7 +162,7 @@ jobs:
             type=ref,event=tag
             type=semver,pattern={{version}}
       - name: Build (Push nur auf push-Events)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: services/core
           push: ${{ github.event_name == 'push' }}
@@ -181,10 +181,10 @@ jobs:
       || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
       - name: Kern-Image bauen (in den Daemon laden)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: services/core
           load: true
@@ -207,8 +207,8 @@ jobs:
   licenses:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: services/core/uv.lock
@@ -219,7 +219,7 @@ jobs:
           echo '## Python-Lizenzen (services/core)' >> "$GITHUB_STEP_SUMMARY"
           uv run --with pip-licenses pip-licenses --format=markdown --with-urls \
             >> "$GITHUB_STEP_SUMMARY" || true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: npm-Lizenzen (license-checker)
@@ -234,7 +234,7 @@ jobs:
     if: needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Doku-Gate (Frontmatter + interne Links)
         run: bash scripts/docs-check.sh
 
