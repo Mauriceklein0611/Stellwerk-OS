@@ -51,3 +51,24 @@ body:
   - type: input
     id: deps
     attributes: { label: Hängt ab von, placeholder: "#3, #4" }
+  - type: checkboxes
+    id: doc_impact
+    attributes:
+      label: Dokumentationsauswirkung
+      description: >-
+        Regel: Wenn Code, Vertrag, Konfiguration, Datenmodell, Sicherheitsgrenze,
+        Nutzer- oder Betriebsverhalten geändert werden, wird die betroffene Doku
+        im selben PR aktualisiert (docs/platform/documentation-policy.md).
+      options:
+        - label: Keine (im Ziel/Kontext begründen)
+        - label: Produktziel/Release Charter/PRD
+        - label: Architektur
+        - label: ADR
+        - label: API-/Event-Vertrag
+        - label: Datenmodell
+        - label: Konfiguration
+        - label: Produktionshandbuch/Runbook
+        - label: Testdokumentation
+        - label: Sicherheitsdokumentation
+        - label: Benutzer-/Moduldokumentation
+        - label: Changelog
