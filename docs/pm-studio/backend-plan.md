@@ -1,12 +1,23 @@
 ---
 module: pm-studio
 type: doc
-status: current
+status: superseded
+updated: 2026-07-21
 imported: 2026-07-08
 source: projectmind-os
+superseded_by: docs/platform/adrs/ADR-011-runtime-and-definitions-ownership.md
 ---
 
 # Backend-Plan (ab Meilenstein 6)
+
+> **`superseded` (2026-07-21).** Der hier beschriebene Ansatz eines **separaten
+> PMS-FastAPI/SQLite-Backends** ist durch
+> [ADR-011 · Runtime- und Definitions-Ownership](../platform/adrs/ADR-011-runtime-and-definitions-ownership.md)
+> **verworfen**: Ausführung und Run-Wahrheit liegen im generischen Kern
+> (`services/core`), das PM-Studio-Modul besitzt nur ein versioniertes Manifest
+> (`pms.draft@1.0.0`) und registriert es über die Core-API. Dieses Dokument bleibt
+> als historische Baseline erhalten; der verbindliche Zielweg steht in ADR-011 und
+> der [roadmap.md](../platform/roadmap.md).
 
 ## Stack
 

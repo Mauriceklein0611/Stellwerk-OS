@@ -27,6 +27,7 @@ FastAPI) mit geteilten Diensten, darauf gleichrangige Fachmodule (`apps/*`).
 - [Build-Spec (v0.1, historische Baseline)](platform/build-spec.md)
 - [Arbeitssystem](platform/arbeitssystem.md) – Tickets, Branches, Doku-System
 - [Dokumentations-Policy](platform/documentation-policy.md) – Frontmatter, Wahrheitshierarchie, Pflegeprozess
+- [ADR-Index](platform/adrs/README.md) – tragende Architekturentscheidungen (ADR-011–015 accepted)
 - [Glossar](platform/glossar.md)
 
 ### Kern (`services/core`)
