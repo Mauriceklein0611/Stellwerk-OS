@@ -39,25 +39,35 @@ FastAPI) mit geteilten Diensten, darauf gleichrangige Fachmodule (`apps/*`).
 - [Risikoregister](platform/risk-register.md)
 - [Product Decision Records](platform/decisions/README.md) · [PRDs](platform/prds/README.md)
 
-### Kern (`services/core`)
-- [Kern-Architektur](core/architecture.md)
-- [Kern-API-Überblick](core/api.md) *(Wahrheit: generiertes OpenAPI / `packages/contracts`)*
+### Architektur (Ist-Zustand)
+- [Architektur-Überblick (arc42-lite)](architecture/README.md)
+- [Laufzeit- & Datenflüsse](architecture/runtime-and-dataflows.md)
+- [Deployment & Topologie](architecture/deployment.md)
+- [Datenmodell & Ownership](architecture/data-model.md)
+
+### Dienste (Service-Handbücher)
+- [Dienste-Index](services/README.md) – implementiert vs. `proposed`
+- [Model Gateway](services/model-gateway.md) · [Telemetrie/Kosten](services/telemetry-costs.md) · [Identity](services/identity.md)
+- Kern-Detailarchitektur: [core/architecture.md](core/architecture.md)
+
+### API
+- [Kern-API-Überblick](api/README.md) *(Wahrheit: generiertes OpenAPI / `packages/contracts`)*
+- [Contract-Pipeline](core/api.md)
+
+### Betrieb, Test & Security
+- [Production Handbook (Index)](operations/README.md) · [CI-Runbook](runbooks/ci.md) · [Monitoring](runbooks/monitoring.md)
+- [Teststrategie](testing/strategy.md) · [Testmatrix](testing/test-matrix.md)
+- [Security-Überblick](security/README.md) · [Traceability](governance/traceability.md)
 
 ### PM Studio (`apps/pm-studio`)
 - [PM-Studio-Doku](pm-studio/README.md)
 
-### Betrieb
-- [CI-Runbook](runbooks/ci.md)
-- [Monitoring-Runbook](runbooks/monitoring.md)
-
 ### Vorlagen
 - [docs/templates/](templates/) – ADR, PRD, Release-Charter, Service-Doc, Runbook, Test-Evidence
 
-> Technische Indizes (`architecture/`, `services/`, `api/`, `operations/`,
-> `testing/`, `security/`, `governance/`) entstehen entlang der Arbeitspakete
-> #63/#64 gemäß [roadmap.md §Teil 8.2](platform/roadmap.md) und werden hier
-> verlinkt, sobald sie belegten Inhalt tragen. Leere Zukunftsordner werden bewusst
-> nicht angelegt.
+> Doku-Qualitäts-Gate in CI (Frontmatter/Links/Markdown) folgt mit #64. Doku-Verzeichnisse
+> für künftige Module (idp/leitstand/rag/flow) entstehen erst mit deren realem
+> Implementierungsschnitt — keine leeren Zukunftsordner.
 
 ## Onboarding-Routen
 
