@@ -65,8 +65,9 @@ FastAPI) mit geteilten Diensten, darauf gleichrangige Fachmodule (`apps/*`).
 ### Vorlagen
 - [docs/templates/](templates/) – ADR, PRD, Release-Charter, Service-Doc, Runbook, Test-Evidence
 
-> Doku-Qualitäts-Gate in CI (Frontmatter/Links/Markdown) folgt mit #64. Doku-Verzeichnisse
-> für künftige Module (idp/leitstand/rag/flow) entstehen erst mit deren realem
+> Doku-Qualität ist in CI abgesichert (`docs`-Job → `bash scripts/docs-check.sh`:
+> Frontmatter + interne Links, blockierend über `ci-ok`). Doku-Verzeichnisse für
+> künftige Module (idp/leitstand/rag/flow) entstehen erst mit deren realem
 > Implementierungsschnitt — keine leeren Zukunftsordner.
 
 ## Onboarding-Routen
