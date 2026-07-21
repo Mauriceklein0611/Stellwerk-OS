@@ -26,6 +26,6 @@ Stand der CI (`.github/workflows/ci.yml`). `proposed`-Zeilen sind noch nicht ver
 | Repo | SAST | CodeQL (JS/TS + Python) | `codeql.yml` | separat |
 | Kern + PMS | Container-Smoke (bauen+starten) | Compose/HTTP | `proposed` (#55) | — |
 | `apps/pm-studio` | Browser-E2E (kritischer Smoke) | Playwright | `proposed` (#59) | — |
-| Doku | Frontmatter/Links/Markdown | offen | `proposed` (#64) | — |
+| Doku | Frontmatter + interne Links | `scripts/docs-check.sh` (zero-dep) | `docs` | ✅ |
 
 Lizenz-Report (`licenses`) läuft, ist aber **nicht** blockierend.

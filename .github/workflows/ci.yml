@@ -26,6 +26,7 @@ jobs:
       pms: ${{ steps.f.outputs.pms }}
       contracts: ${{ steps.f.outputs.contracts }}
       docker: ${{ steps.f.outputs.docker }}
+      docs: ${{ steps.f.outputs.docs }}
     steps:
       - uses: actions/checkout@v4
       - id: f
@@ -44,6 +45,9 @@ jobs:
               - '**/Dockerfile'
               - 'docker-compose.yml'
               - 'compose.prod.yml'
+            docs:
+              - 'docs/**'
+              - 'scripts/docs-check.sh'
 
   # Python-Gate des Kerns inkl. echtem Postgres (DB-Tests reproduzierbar).
   core:
@@ -223,10 +227,21 @@ jobs:
           echo '## npm-Lizenzen (root)' >> "$GITHUB_STEP_SUMMARY"
           npx --yes license-checker --summary >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
 
+  # Doku-Qualitäts-Gate: Frontmatter + interne Links (zero-dependency Skript,
+  # offline). Details/lokaler Aufruf: docs/runbooks/ci.md.
+  docs:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Doku-Gate (Frontmatter + interne Links)
+        run: bash scripts/docs-check.sh
+
   # Sammel-Gate: EIN required check für Branch-Protection. Übersprungene Jobs
   # (Pfadfilter) sind ok, nur echte Fehler/Abbrüche lassen ihn scheitern.
   ci-ok:
-    needs: [changes, core, contracts, pms, docker, trivy]
+    needs: [changes, core, contracts, pms, docker, trivy, docs]
     if: always()
     runs-on: ubuntu-latest
     steps:

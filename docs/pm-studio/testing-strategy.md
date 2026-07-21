@@ -2,6 +2,7 @@
 module: pm-studio
 type: doc
 status: current
+updated: 2026-07-08
 imported: 2026-07-08
 source: projectmind-os
 ---
