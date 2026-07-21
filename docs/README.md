@@ -30,6 +30,15 @@ FastAPI) mit geteilten Diensten, darauf gleichrangige Fachmodule (`apps/*`).
 - [ADR-Index](platform/adrs/README.md) – tragende Architekturentscheidungen (ADR-011–015 accepted)
 - [Glossar](platform/glossar.md)
 
+### Produkt & Management
+- [Product Brief](platform/product-brief.md) – Problem, Zielgruppen, Nutzenversprechen
+- [Ziele & Nicht-Ziele](platform/goals-and-non-goals.md) – Reifegrenze, Portfolio-Cut
+- [Outcomes](platform/outcomes.md) – messbare Produktziele & Erfolgsnachweise
+- [Stakeholder & Personas](platform/stakeholders-and-personas.md)
+- [Release Charter v0.2](platform/release-charters/v0.2.md) – aktiver Meilenstein
+- [Risikoregister](platform/risk-register.md)
+- [Product Decision Records](platform/decisions/README.md) · [PRDs](platform/prds/README.md)
+
 ### Kern (`services/core`)
 - [Kern-Architektur](core/architecture.md)
 - [Kern-API-Überblick](core/api.md) *(Wahrheit: generiertes OpenAPI / `packages/contracts`)*
@@ -44,10 +53,11 @@ FastAPI) mit geteilten Diensten, darauf gleichrangige Fachmodule (`apps/*`).
 ### Vorlagen
 - [docs/templates/](templates/) – ADR, PRD, Release-Charter, Service-Doc, Runbook, Test-Evidence
 
-> Bereiche wie `product/`, `governance/`, `architecture/`, `operations/`,
-> `testing/`, `security/` entstehen entlang der Arbeitspakete #61–64 und werden
-> hier verlinkt, sobald sie belegten Inhalt tragen. Leere Zukunftsordner werden
-> bewusst nicht angelegt.
+> Technische Indizes (`architecture/`, `services/`, `api/`, `operations/`,
+> `testing/`, `security/`, `governance/`) entstehen entlang der Arbeitspakete
+> #63/#64 gemäß [roadmap.md §Teil 8.2](platform/roadmap.md) und werden hier
+> verlinkt, sobald sie belegten Inhalt tragen. Leere Zukunftsordner werden bewusst
+> nicht angelegt.
 
 ## Onboarding-Routen
 
