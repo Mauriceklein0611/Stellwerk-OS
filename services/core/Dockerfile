@@ -29,7 +29,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
 # ---------- Runtime ----------
-FROM python:3.12-slim-bookworm AS runtime
+FROM python:3.14-slim-bookworm AS runtime
 
 # Non-root-Benutzer (Akzeptanzkriterium: Container laufen non-root).
 RUN groupadd --system app \
